@@ -1,7 +1,12 @@
 #!/bin/bash
 
 if [ ! -z ${BASH_SOURCE} ]; then
-	ssh -i ~/.ssh/id_rsa_do root@dodev "bash -s" -- < ${BASH_SOURCE}
+    if [ -z ${DODEV} ]; then
+        echo "Please, set DODEV env variable"
+        exit 1
+    fi
+
+	ssh -i ~/.ssh/id_rsa_do root@$DODEV "bash -s" -- < ${BASH_SOURCE}
 	exit
 fi
 
@@ -20,6 +25,7 @@ usermod -aG sudo vdimir
 echo " ===== Install Packages ====="
 
 apt-get update
+apt-get install -y tmux
 apt-get install -y cmake ninja-build python sudo
 apt-get install -y clang clang-10 clang++10 libc++-dev lld ccache
 
@@ -29,7 +35,6 @@ echo " ===== Setup Config Files ====="
 
 echo " ===== .bashrc ====="
 cat <<EOT >> /home/vdimir/.bashrc
-# export CC=gcc-9 CXX=g++-9
 export CC=clang CXX=clang++
 export EDITOR=vim
 alias df="df -h"
